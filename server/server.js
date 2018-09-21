@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyparser = require('body-parser');
+var {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
@@ -22,8 +23,8 @@ app.post('/todos',(req,res)=>{
 })
 
 app.get('/todos',(req,res)=>{
-  Todo.find().then((doc)=>{
-    res.send({doc});
+  Todo.find().then((todos)=>{
+    res.send({todos});
   },(err)=>{
     res.esnd(err);
   });
@@ -35,17 +36,34 @@ app.post('/users',(req,res)=>{
     });
 
     user.save().then(
-    (doc)=>{
-        res.status(200).send(doc);
+    (todo)=>{
+        res.send(todo);
     },
     (err)=>{
         res.status(400).send(err);
     });
 });
 
+app.get('/todos/:id',(req,res)=>{
+    var id = req.params.id;
+    if(!ObjectID.isValid(id)){
+       return res.status(404).send();
+    }
+    Todo.findById(id).then((todo)=>{
+        if(!todo){
+            console.log('inside not is');
+           return res.send(404).send();
+        }
+        res.send(todo);
+    }).catch((e)=>{
+        res.status(400).send();
+    })
+});
+
+
 app.get('/users',(req,res)=>{
-User.find().then((doc)=>{
-    res.send({doc});
+User.find().then((users)=>{
+    res.send({users});
 },(err)=>{
     res.send(err);
 });
