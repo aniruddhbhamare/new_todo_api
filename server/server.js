@@ -20,6 +20,15 @@ app.post('/todos',(req,res)=>{
       res.status(400).send(err);
   });
 })
+
+app.get('/todos',(req,res)=>{
+  Todo.find().then((doc)=>{
+    res.send({doc});
+  },(err)=>{
+    res.esnd(err);
+  });
+});
+
 app.post('/users',(req,res)=>{
     var user = new User({
         name:req.body.name
@@ -34,6 +43,13 @@ app.post('/users',(req,res)=>{
     });
 });
 
+app.get('/users',(req,res)=>{
+User.find().then((doc)=>{
+    res.send({doc});
+},(err)=>{
+    res.send(err);
+});
+});
 
 app.listen(3000,()=>{
     console.log('server is running on port 3000');
