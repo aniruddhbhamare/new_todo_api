@@ -6,7 +6,11 @@ var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 
+
 var app = express();
+
+const port = process.env.PORT || 3000;
+
 app.use(bodyparser.json());
 
 app.post('/todos',(req,res)=>{
@@ -69,8 +73,8 @@ User.find().then((users)=>{
 });
 });
 
-app.listen(3000,()=>{
-    console.log('server is running on port 3000');
+app.listen(port,()=>{
+    console.log(`server is running on ${port} `);
 });
 
 // var newUser = new User({
