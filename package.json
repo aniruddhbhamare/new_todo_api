@@ -4,15 +4,16 @@
   "main": "index.js",
   "author": "Ani",
   "license": "MIT",
-  "scripts":{
-    "start":"node server/server.js"
+  "scripts": {
+    "start": "node server/server.js"
   },
-  "engines":{
-  "node":"9.11.1"
+  "engines": {
+    "node": "9.11.1"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
+    "lodash": "^4.17.11",
     "mongodb": "^3.1.6",
     "mongoose": "^5.2.16"
   }

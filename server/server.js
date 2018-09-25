@@ -1,6 +1,7 @@
-var express = require('express');
-var bodyparser = require('body-parser');
-var {ObjectID} = require('mongodb');
+const _ = require('lodash');
+const express = require('express');
+const bodyparser = require('body-parser');
+const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
@@ -34,6 +35,67 @@ app.get('/todos',(req,res)=>{
   });
 });
 
+app.get('/todos/:id',(req,res)=>{
+    var id = req.params.id;
+    if(!ObjectID.isValid(id)){
+       return res.status(404).send();
+    }
+    Todo.findById(id).then((todo)=>{
+        if(!todo){
+
+           return res.status(404).send();
+        }
+        res.send(todo);
+    }).catch((e)=>{
+
+        res.status(400).send();
+    });
+});
+
+// Todo.remove().then((res)=>{
+//     console.log(res);
+// });
+
+app.delete('/todos/:id',(req,res)=>{
+    var id = req.params.id;
+
+    if(!ObjectID.isValid(id)){
+      return res.status(404).send();
+    }
+    Todo.findByIdAndRemove(id).then((todo)=>{
+       if(!todo){
+       return res.status(404).send();   
+       }
+        res.send(todo);
+    }).catch((e)=>{
+        res.status(400).send();
+    });
+});
+
+app.patch('/todos/:id',(req,res)=>{
+    var id = req.params.id;
+    var body = _.pick(req.body,['text','completed']); 
+
+ if(!ObjectID.isValid(id)){
+    return res.status(404).send();
+ }
+ if(_.isBoolean(body.completed) && body.completed){
+     body.completedAt = new Date().getTime(); 
+ } else {
+     body.completed = false;
+     body.completedAt = null;
+ }
+Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo)=>{
+    if(!todo){
+       return res.status(404).send();
+    }
+    res.send({todo});
+}).catch((e)=>{
+    return res.status(400).send();
+})
+
+});
+
 app.post('/users',(req,res)=>{
     var user = new User({
         name:req.body.name
@@ -47,23 +109,6 @@ app.post('/users',(req,res)=>{
         res.status(400).send(err);
     });
 });
-
-app.get('/todos/:id',(req,res)=>{
-    var id = req.params.id;
-    if(!ObjectID.isValid(id)){
-       return res.status(404).send();
-    }
-    Todo.findById(id).then((todo)=>{
-        if(!todo){
-            console.log('inside not is');
-           return res.send(404).send();
-        }
-        res.send(todo);
-    }).catch((e)=>{
-        res.status(400).send();
-    })
-});
-
 
 app.get('/users',(req,res)=>{
 User.find().then((users)=>{
