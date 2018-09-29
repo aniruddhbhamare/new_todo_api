@@ -7,6 +7,7 @@ var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
+var bcrypt = require('bcryptjs');
 
 
 var app = express();
@@ -99,7 +100,7 @@ Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo)=>{
 
 app.post('/users',(req,res)=>{
     // var user = new User({
-    //     email:req.body.email,
+    //     email:req.params.email,
     //     password:req.params.password,
     //     tokens:req.params.tokens
     // });
@@ -129,11 +130,23 @@ app.get('/users/me',authenticate,(req,res)=>{
     res.send(req.user);
 });
 
+app.post('/users/login',(req,res)=>{
+    var body = _.pick(req.body,['email','password']);
+    User.findByCredentials(body.email, body.password).then((user)=>{
+      res.send(user); 
+    }).catch((e)=>{
+        res.status(400).send();
+    });   
+});
+
+
+
+
 app.get('/users',(req,res)=>{
 User.find().then((users)=>{
     res.send({users});
 }).catch((e)=>{
-    res.status(404).send(e);
+    res.status(404).send();
 })
 // ,(err)=>{
 //     res.send(err);
